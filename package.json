@@ -13,11 +13,11 @@
   ],
   "author": {
     "name": "Iakiv Kramarenko",
-    "email": "yashaka@gmail.com"
+    "email": "automician@gmail.com"
   },
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^8.6.0",
+    "cypress": "^9.0.0",
     "cypress-file-upload": "^5.0.8",
     "eslint": "^8.0.1",
     "eslint-plugin-chai-friendly": "^0.7.2",
