@@ -2,14 +2,31 @@
   "name": "cypress-selene",
   "version": "0.0.1",
   "description": "Selene and Selenide based API to Cypress for easy to write and support Web UI tests",
+  "main": "src",
+  "types": "src",
+  "files": [
+    "src"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cypress run",
+    "cy:open": "cupress open",
     "lint": "eslint ."
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/automician/cypress-selene.git"
+  },
+  "bugs": {
+    "url": "https://github.com/automician/cypress-selene/issues"
+  },
+  "homepage": "https://github.com/automician/cypress-selene",
   "keywords": [
     "testing",
     "test",
-    "cypress"
+    "selene",
+    "selenide",
+    "cypress",
+    "cypress-io"
   ],
   "author": {
     "name": "Iakiv Kramarenko",
