@@ -1,6 +1,6 @@
 import { form } from "../../../support/model/examples/demoqa/components/form.component"
 import { table } from "../../../support/model/examples/demoqa/components/table.component"
-import { autoComplete, checked, dateToPick, file, option, radioText, value } from "../../../support/model/examples/demoqa/controls/index"
+import { autoComplete, checked, dateToPick, file, option, radioText, value } from "../../../support/model/examples/demoqa/controls"
 import { Gender, Hobbies, user } from "../../../support/model/examples/demoqa/data/user.data"
 import { registration } from "../../../support/model/examples/demoqa/steps/registration.steps"
 

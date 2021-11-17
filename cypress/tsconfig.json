@@ -2,10 +2,18 @@
   "compilerOptions": {
     "checkJs": true,
     "maxNodeModuleJsDepth": 1,
+    "moduleResolution": "node",
     "target": "ES2021",
     "allowJs": true,
-    "types": ["cypress", "cypress-file-upload"],
+    "types": [
+      "cypress", 
+      "cypress-file-upload",
+    ],
     "noEmit": true
   },
-  "include": ["**/*.*"]
+  "include": [
+    "**/*.*",
+  ],
+  "exclude": [
+  ],
 }

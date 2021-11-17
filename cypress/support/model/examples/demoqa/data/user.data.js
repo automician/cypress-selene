@@ -1,4 +1,4 @@
-import * as the from "../controls/index"
+import * as the from "../controls"
 
 
 /**
