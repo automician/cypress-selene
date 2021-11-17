@@ -1,7 +1,7 @@
 {
-  "name": "cypress-web-test-js-template",
+  "name": "cypress-selene",
   "version": "0.0.1",
-  "description": "JavaScript + Cypress template, guide and starter kit for Web UI Tests",
+  "description": "Selene and Selenide based API to Cypress for easy to write and support Web UI tests",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ."
