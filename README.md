@@ -155,7 +155,7 @@ See more examples at [integration/examples/todomvc.spec.js](https://github.com/a
 ## Intallation
 
 ```bash
-npm install -D cypress-xpath
+npm install -D cypress-selene
 ```
 
 Then include in your project's `cypress/support/index.js`
