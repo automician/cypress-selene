@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security 
 - in case of vulnerabilities.
 
+## [1.0.0-alpha.2] - 2021-11-20
+### Added
+- locator.first(), locator.last()
+
 ## [1.0.0-alpha.1] - 2021-11-19
 ### Added
 - Locator class as Lazy and Fluent API wrapper 

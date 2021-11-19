@@ -202,6 +202,8 @@ The smarter retriability magic added to Cypress as a part of this package will m
       see custom commands explanations below;)
     - `.find(selector)`
     - `.eq(index)`
+    - `.first()`
+    - `.last()`
     - `.next(selector)`
     - `.should(matcher, *args)`
   - with all methods above 

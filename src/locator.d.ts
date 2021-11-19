@@ -120,6 +120,30 @@ export class Locator {
   ): Locator
 
   /**
+   * Lazy ratriable version of cy.first(options)
+   * @param selector 
+   * @param options 
+   */
+  first(
+    options?: Partial<
+      Cypress.Loggable 
+      & Cypress.Timeoutable 
+    >,
+  ): Locator
+
+  /**
+   * Lazy ratriable version of cy.last(options)
+   * @param selector 
+   * @param options 
+   */
+  last(
+    options?: Partial<
+      Cypress.Loggable 
+      & Cypress.Timeoutable 
+    >,
+  ): Locator
+
+  /**
    * Lazy ratriable version of cy.find(selector, options)
    * @param selector 
    * @param options 

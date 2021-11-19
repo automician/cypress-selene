@@ -369,6 +369,20 @@ export class Locator {
     return this._subQuery({ path, query })
   }
 
+  first(options={}) {
+    const path = `-first`
+    const query = (subject) => subject.first(options)
+
+    return this._subQuery({ path, query })
+  }
+
+  last(options={}) {
+    const path = `-last`
+    const query = (subject) => subject.last(options)
+
+    return this._subQuery({ path, query })
+  }
+
   next(selector, options={}) {
     const path = `-next ${selector}`
     const query = (subject) => subject.next(selector, options)
