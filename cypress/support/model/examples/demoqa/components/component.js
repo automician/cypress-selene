@@ -1,4 +1,4 @@
-import { Locator } from "../../../../locator"
+import { Locator } from "../../../../../../src"
 
 
 export const Component = {

@@ -1,324 +1,319 @@
 ## Summary
 
-This is a template project with some guide that shows how to tune Cypress to higher level in context of writing more user-oriented and easier to use High-Level System End-to-End tests. It often uses ideas of the Selenides family of Web UI Testing Frameworks (like Selenide in Java, Selene in Python, NSelene in C#, SelenideJs in JavaScript).
+This library is a bunch of cypress extensions for writing more «user-oriented» and «easier to use» High-Level System End-to-End tests. It often uses ideas of the Selenides family of Web UI Testing Frameworks (like [Selenide](https://selenide.org) in Java, [Selene](https://github.com/yashaka/selene/) in Python, [NSelene](https://github.com/yashaka/NSelene/) in C#, [SelenideJs](https://github.com/KnowledgeExpert/selenidejs) in JavaScript).
 
-## Main features overview
+See [changelog](https://github.com/automician/cypress-selene/blob/main/CHANGELOG.md) for detailed feature break down;)
 
-Main features added:
-- Selenide/Selene style aliases to existing conditions: .should(have.text, 'cleaner') over `.should('have.text', 'dirty')`
-  - more custom elements collection conditions like texts, exactTexts from Selenide
-- Selene style aliases: `browser.*` over `cy.*`, `s(selector).get()` over `cy.get(selector)`
-- lazy elements for basic more common use cases: `const clean = s('#clean')` over `const bulky = () => cy.get('#bylky')`
-  - to make code more concise by removing Cypress limitation of not being able to store elements in vars
 
-## Intro 
+## Why is it needed?
 
-**Given** Cypress…:
+Because raw Cypress:
+- lacks important "colellection conditions" aka "matcher for collections"
+- retries only the last command, that leads to longer selectors, that can't be break down for faster support on failure (you can't figure out from the log which exact part of long selector had a problem)
+- is not lazy, leading to different hacks and workarounds for DRYing the code. 
 
-* pros
-  * Shift-left oriented, force you to write and learn how to write oprimised efficient tests
-    * Best Docs in class to teach you how to do it
-      * An Example/Recipe for almost any case
-  * State of the art Debugging
-  * ~~almost~~ no redundant async/await in usage
-* cons
-  * overblown not consistent (with both itself and common JS libs) and not obvious API, you have to read enormous documentation to learn each nuances
-    * while having access to all methods – not everything work as you expected depending from context, sometimes – just do not work
-    * more than one way (often not consistent with each other) to do things (especially when working with aliases)
-  * lower level of API style, while the tests to be written should be normally more high level and user oriented
-    * just a few examples:
-      *  `cy.get(selector)` instead of something like `element(selector)`, 
-      * `cy.visit(url)` instead of `browser.visit(url)`, or `page.load(url)`
-  * has no lazy element builders
-    * selectors can't be easily broken into parts for easier support during "healing selectors on change"
-    * when broken – the waiting will not work as you expect ([only the last command is retried](https://docs.cypress.io/guides/core-concepts/retry-ability#Only-the-last-command-is-retried)) and tests become fragile, so in complex UI scenarios you kind of forced [allways to stick to long merged selectors](https://docs.cypress.io/guides/core-concepts/retry-ability#Merging-queries) or overblown your code with [explicit assertions](https://docs.cypress.io/guides/core-concepts/retry-ability#Alternate-commands-and-assertions)
-  * "dirty" API like in `.should('have.text', 'dirty')` instead of something like  `.should(have.text, 'cleaner')`
-    * such API is also much harder to extend keeping Autocomplete and Hints working as you expect
+### Quick example
 
-**When**
+So, you get this:
 
-* We have smart Juniors willing learn and achieve ASAP the best result from Automation
-  * And lack Senior resources
-* We have a project where Cypress is already a tool to use, with no way to change it
+```javascript
 
-**Then**
+const newTodo = s('#new-todo')
+const todos = s('#todo-list>li')
+const completed = todos.by('.completed')
+const active = todos.not('.completed')
+const complete = (todo) => {
+  todos.by(`:contains(${todo})`).find('.toggle').click()
+}
 
-* We have this Template and Guide to make your life easier ;)
-  * It is a mixture of "quick just do it setup actions" and more advanced "extending the framework to tune it to your needs"
+// ...
 
-But before going further, ensure you are familiar with:
+it('completes todo', () => {
+  browser.visit('https://todomvc.com/examples/emberjs/')
 
-* TODO…
+  newTodo.type('a').pressEnter()
+  newTodo.type('b').pressEnter()
+  newTodo.type('c').pressEnter()
+  todos.should(have.exactTexts, 'a', 'b', 'c')
 
-## Notes on tech stack
-
-* This is a JavaScript project. TypeScript's *.d.ts files for main Cypress API extensions are used here only to improve autocomplete feature in popular editors, like Visual Studio Code, that have typescript support buit in.
-  * In general, using TypeScript for the majority of "test automation" projects might be preferrable for an «average» user, because would make "usage" easier on both side - «implementing framework» and «coding actual tests» (with support of Autocomplete, Hints and some more DSLish style when using Annotations)
-  * But here the idea was to show the kitchen from the very low level without much of TypeScript stuff;), focusing on raw JavaScript features and its object-oriented nature (without classes;)), that are also pretty powerfull in context of building some DSL tuned to the context of test automation
-
-## The guide of 
-
-You can just use this project as a template, but in case you want to build same from scratch, tuning it to your needs, here is a detailed guide on how to do this...
-
-1
-
-```shell
-mkdir cypress-js-web-test && cd $_ && npm init -y && git init && echo "#JavaScript\nnode_modules\n\n# Mac\n.DS_Store" > .gitignore && npm install cypress --save-dev && git add . && git commit -m "initial base js skeleton with cypress" && git branch -m main 
+  complete('b')
+  completed.should(have.exactTexts, 'b')
+  active.should(have.exactTexts, 'a', 'c')
+})
 ```
 
+Instead of this:
 
-2
+```javascript
 
-Tune meta-info at package.json
+const todosSelector = '#todo-list>li'
+const newTodo = () => cy.get('#new-todo')
+const todos = () => cy.get(todosSelector)
+const completed = () => todos().filter('.completed')
+const active = () => todos().not('.completed')
+const complete = (todo) => {
+  todos(`${todosSelector}:contains(${todo}) .toggle`).click()
+}
 
+it('completes todo', () => {
+  cy.visit('https://todomvc.com/examples/emberjs/')
 
+  newTodo().type('a{enter}')
+  newTodo().type('b{enter}')
+  newTodo().type('c{enter}')
+  todos().should('have.length', 3)
+  todos().eq(0).should('have.text', 'a')
+  todos().eq(1).should('have.text', 'b')
+  todos().eq(2).should('have.text', 'c')
 
-3
-
-to open Cypress
-
-```shell
-npx cypress open
-```
-
-4 
-
-Setup Autocomplete (https://docs.cypress.io/guides/tooling/IDE-integration#Set-up-in-your-Dev-Environment)
-
-add to `./cypress/tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "allowJs": true,
-    "types": ["cypress"],
-    "noEmit": true
-  },
-  "include": ["**/*.*"]
+  complete('b')
+  completed().should('have.length', 1)
+  completed().eq(0).should('have.text', 'b')
+  active().should('have.length', 2)
+  active().eq(0).should('have.text', 'a')
+  active().eq(1).should('have.text', 'c')
 }
 ```
 
+Notice that we had to use longer, not broken down selector with additional variable interpolation:
+
+```javascript
+  todos(`${todosSelector}:contains(${todo}) .toggle`).click()
+```
 
 
-4.2 
+This is because in Cypress, the broken down version:
 
-
-Setup ts-checks for JavaScript files too (will allow to check typings from jsdocs)
-
-```json
-{
-  "compilerOptions": {
-    "checkJs": true,
-    "maxNodeModuleJsDepth": 1,
-    "target": "ES2021",
-    ...
-  },
-  ...
+```javascript
+const complete = (todo) => {
+  todos().filter(`:contains(${todo})`).find('.toggle').click()
 }
 ```
 
-* set to target the version of js you are interested to (usually same as you add to eslintrc too)
+is not the same as in the «cypress-selene» version:
 
-more resources:
-
-* https://dev.to/t7yang/type-safety-in-javascript-with-jsdoc-and-vscode-1a28
-
-5
-
-Custom commands: more examples
-
-https://docs.cypress.io/api/cypress-api/custom-commands
-
-https://www.toolsqa.com/cypress/custom-commands-in-cypress/
-
-
-
-6
-
-plugins to consider:
-
-cypress
-
-* cypress-plugin-tab
-* https://github.com/dmtrKovalenko/cypress-real-events
-* https://github.com/abramenal/cypress-file-upload
-  * https://docs.cypress.io/faq/questions/using-cypress-faq#How-do-I-test-uploading-a-file
-
-vscode
-
-* https://github.com/Shelex/vscode-cy-helper
-  * https://marketplace.visualstudio.com/items?itemName=Shelex.vscode-cy-helper&ssr=false
-
-7 
-
-add eslint
-
-```shell
-npm install eslint --save-dev && npm install eslint-plugin-cypress --save-dev && npm install --save-dev eslint-plugin-chai-friendly && npx eslint --init
-```
-
-
-
-some links:
-
-* https://github.com/cypress-io/eslint-plugin-cypress
-
-
-
-`.eslintrc.json` example:
-
-```json
-{
-    "plugins": [
-        "cypress",
-        "chai-friendly"
-    ],
-    "globals": {
-        "cy": true,
-        "Cypress": true
-    },
-    "env": {
-        "cypress/globals": true,
-        "es2021": true
-    },
-    "parserOptions": {
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "extends": [
-        "plugin:cypress/recommended",
-        "plugin:chai-friendly/recommended"
-    ],
-    "rules": {
-        "max-len": ["error", { "code": 80, "ignoreComments": true}],
-        "cypress/no-pause": "error"
-    }
+```javascript
+const complete = (todo) => {
+  todos.by(`:contains(${todo})`).find('.toggle').click()
 }
-
 ```
 
-8
+Because Cypress will not retry the all chain and ensure proper waiting. 
 
-Tune your globals
-
-* https://newbedev.com/create-a-global-variable-in-typescript
-  * https://stackoverflow.com/a/56984941/1297371 (https://stackoverflow.com/questions/38906359/create-a-global-variable-in-typescript)
-  * seems like no way to type globals via jsdocs :(
-
-
-
-```
-echo 'global.browser = cy' >> cypress/support/index.js
+Hence, such code is useless:
+```javascript
+todos().filter(`:contains(${todo})`).find('.toggle').click()
 ```
 
+Moreover, it leads to fragile tests.
 
+We can improve it, though, coming to something like the following:
 
-cypress/support/global.d.ts
-
-```typescript
-/// <reference types="cypress" />
-
-
-/**
- * user-oriented alias to `cy`
- */
- declare const browser: Cypress.cy
+```javascript
+const complete = (todo) => {
+  const containsTodo = `:contains(${todo})`
+  const toggle = '.toggle'
+  const haveFiltered = (selector) => ($elements) => {
+    expect($elements.filter(selector).length).to.be.at.least(1)
+  }
+  todos()
+    // needed for better debug: 
+    // to separate error when we have no b from have no .toggle inside
+    .should(haveFiltered(containsTodo)) 
+    // needed for complete stability 
+    // (see https://docs.cypress.io/guides/core-concepts/retry-ability#Alternate-commands-and-assertions)
+    .should(haveFiltered(`${containsTodo}:has(${toggle})`))
+    .filter(containsTodo)
+    .find(toggle)
+    .click()
+}
 ```
 
-* If your file hasn't any `import` or `export`
+yet, a lot with additional assertions and variables! And all this – is already built into «cypress-selene» version:
 
-```typescript
-/// <reference types="cypress" />
+```javascript
+const complete = (todo) => {
+  todos.by(`:contains(${todo})`).find('.toggle').click()
+}
+```
 
-import { Locator } from "./locator"
+See more examples at [integration/examples/todomvc.spec.js](https://github.com/automician/cypress-selene/blob/main/cypress/integration/examples/todomvc.spec.js) and [integration/examples/demoqa/studentRegistrationForm.spec.js](https://github.com/automician/cypress-selene/blob/main/cypress/integration/examples/demoqa/studentRegistrationForm.spec.js)
 
-declare global {
-  /**
-   * user-oriented alias to `cy`
-   */
-   const browser: Cypress.cy
+## Intallation
+
+```bash
+npm install -D cypress-xpath
+```
+
+Then include in your project's `cypress/support/index.js`
+
+```javascript
+require('cypress-selene')
+```
+
+or
+
+```javascript
+import 'cypress-selene'
+```
+
+## Disclaimer
+
+The smarter retriability magic added to Cypress as a part of this package will make tests more stable but also slower. Though, some configuration will be added later – to tune "magic to your needs", and turn it off when you don't need it ;) (stay tuned and watch [#5](https://github.com/automician/cypress-selene/issues/5))
+
+## Main features breakdown
+
+- Selene/Selenide's style elements `s(selector)` returning the object of Locator class
+- Locator class as Lazy and Fluent API wrapper 
+  - over
+    - `cy.get(selector)`, 
+    - `.filter(selector)`
+      - with `.by(selector)` alias, 
+        with additional selector conversions 
+        see custom commands explanations below;)
+    - `.not(selector)`
+      with additional selector conversions 
+      see custom commands explanations below;)
+    - `.find(selector)`
+    - `.eq(index)`
+    - `.next(selector)`
+    - `.should(matcher, *args)`
+  - with all methods above 
+    - being lazy, returning same Locator instance with "updated" selector path
+      - so you can store it in the var, like
+        `const active = new Locator({path: '#todo-list>li'}).not('.completed')`
+    - being fully retriable (cypress only retries the last command)
+      - with integrated smart waits/assertions per retry
+        so you see in log what was the reason of retry and its failure in the worst case
+        i.e. you can break down long selectors into parts in order to see in the log the exact problematic part
+        and so fasten your tests support ;)
+  - with non lazy commands, that actually find subject to perform actual actions
+    - `locator.get()` returning actual cy subject
+      - here the lazyness ends, and all subsequent API is a raw Cypress one, 
+        i.e. not lazy, and you can not store it into vars)
+      - it's usefull to force it to get raw subject and use classic cy command that is not yet available in Locator.*
+    - `locator.type(text)`
+    - `locator.clear()`
+    - `locator.submit()`
+    - `locator.setValue(text)`
+      - as alias to `.clear().type(text)`
+    - `locator.click()`
+    - `locator.doubleClick()`
+      - as more user-oriented alias to `.dbclick` 
+    - `locator.hover()`
+      - as alias to .trigger('mousover')
+    - `locator.pressEnter()`
+    - `locator.pressEscape()`
+
+- globals 
+  - ... planned to be removed from globals in newer versions ;)
+  - Selene's style 
+    - `browser` as alias to `cy`
+      - for more user-oriented `browser.visit('https://url.org')` over `cy.visit('https://url.org')`
+    - `s(selector)` as alias to new `Locator({path: selector})`
+      - to allow lazy (also with full retriability)
+        ```
+        const todos = s('#todo-list>li)
+        //...
+        todos.should(/*...*/)
+        todos.filter('.completed').should(/*...*/)
+        ```
+        over not-fully-retriable and lazy-only-via-functions
+        ```
+        const todos = () => cy.get('#todo-list>li)
+        //...
+        todos().should(/*...*/)
+        todos().filter('.completed').should(/*...*/) // Cypress retries only .filter(...) here
+        ```
+    - `be.*` and `have.*` 
+      - as aliases to some most used cypress «chainers/matchers/conditions»
+      - for cleaner code (when reviewing it will be easier to distinguish code from test data;):
+        ```
+        s('#todo-list>li').eq(1).should(have.text, 'i am test data, emphasized by quotes;)')
+        ```
+        over 
+        ```
+        s('#todo-list>li').eq(2).should('have.text', 'of same style as prev arg')
+        ```
+
+- customized commands
+  - new
+    - `cy.the(wordOrSmarterSelector)` in addition to `cy.get(selector)`
+      - to consider all words as values of `data-qa` attributes
+        i.e. `cy.the('submit')` is same as `cy.get('[data-qa=submit]')`
+        support of customizing such «data qa attributes» will be added later [#2](https://github.com/automician/cypress-selene/issues/2)
+      - to support Playwright style «search by text»
+        i.e. `cy.the('text=Press me')` is same as `cy.contains('Press me')`
+      - same as `cy.get(selector)` otherwise  
+      - support of customizing such conversions will be added later [#3](https://github.com/automician/cypress-selene/issues/3)
+    - `cy.by(smarterSelector)` as alias to `cy.filter(selector)` 
+      - for conciseness
+      - and smarter conversions:
+        ```
+        cy.get('.todo').by(':contains("Write a test!")')
+        cy.get('.todo').by('text=Write a test')  // same as above
+
+        cy.get('.todo').by('.completed')  // same as cy.get('.todo').filter('.completed')
+        cy.get('.todo').by(':not(.completed)')  // same as cy.get('.todo').not('.completed')
+
+        cy.get('.todo').by(':has(img.high-priority-flag)')  // same as cy.get('.todo').filter(':has(img.high-priority-flag)')
+        cy.get('.todo').by(' img.high-priority-flag')  // same as above
+
+        cy.get('.todo').by(':has(>img.high-priority-flag)')
+        cy.get('.todo').by('>img.high-priority-flag')  // same as above
+        ```
+        P.S. `s(selector)` is also available 
+        for even conciser: 
+        ```
+        s('.todo').by('text=Write a test')
+        s('.todo').by('.completed')
+        ```
+  - overwritten 
+    - `cy.not` for same conversions as in custom `cy.by`
+
+- customized conditions (matchers)
+  - new
+    - `have.texts(...partialValues)`
+      - for conciser version
+        ```
+        s('#todo-list li').should(have.texts, 'a', 'c')
+        ``` 
+        over raw cypress 
+        ```
+        cy.get('@todo-list li').as('todos')
+        //...
+        cy.get('@todos').should('have.length', 2)
+        cy.get('@todos')
+        .eq(0)
+        .should('contain', 'a')
   
-  
-   /**
-    * Gives a Lazy alternative to cy.get(selector)
-    * @param selector = a string with css selector
-    * @example
-    * s('#foo').get().setValue('bar')
-    * # over
-    * # cy.get('#foo').setValue('bar')
-    */
-  function s(selector: string): Locator
-}
-```
+        cy.get('@todos')
+        .eq(1)
+        .should('contain', 'c')
+        ```
+        ... 🤦🏻‍♂️ – check real [official example](https://github.com/cypress-io/cypress-example-todomvc/blob/4e5637b8e00d25d8661c455b2e3c026ee8d8c175/cypress/integration/app_spec.js#L495)
+    - `have.exactTexts(...values)`
+    - `have.elements(selector)` or `have.the(selector)`
+      - as alias to 
+        `.should(($elements) => { expect($elements.has(selector).length).to.be.gt(0) })`
+    - `have.filtered(selector)`
+      - as alias to 
+        `.should(($elements) => { expect($elements.filter(selector).length).to.be.gt(0) })`
+  - changed in alias (have.* or be.*)
+    - for better readability according to native english in `be.*` style
+      -  `be.equalTo` over `'equal'` 
+      -  `be.matching` over `'match'` 
+      -  `be.containing` over `'contain'` 
+      -  `have.valueContaining` over `'contain.value'` 
+    -  `be.inDOM` over `'exist'` for less confusion in understanding from the user perspective
+    - `have.text` over `'include.text'` as in Selenide/Selene, 
+      because in native english «have text» naturally means «have some text inside»
+    - `have.exactText` over `'have.text'` as in Selenide/Selene, 
+    - `have.cssClass` over `'have.class'` as in Selenide/Selene 
+      for less confusion, because «class» is also the whole attribute 
+      that can contain many «css classes»
 
-* If your file has any `import` or `export` line
-
-
-
-9 Tune and extend assertions
-
-* https://docs.cypress.io/guides/references/assertions
-  * https://docs.cypress.io/api/commands/should#Verify-length-content-and-classes-from-multiple-lt-p-gt
-  * https://docs.cypress.io/guides/references/assertions#Adding-New-Assertions
-    * https://www.chaijs.com/api/plugins/
-      * https://www.chaijs.com/guide/plugins/#composing-an-assertion
-      * https://www.chaijs.com/guide/helpers/
-    * https://github.com/cypress-io/cypress-example-recipes/tree/master/examples/extending-cypress__chai-assertions
-      * https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/extending-cypress__chai-assertions/cypress/support/index.js
-      * https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/extending-cypress__chai-assertions/cypress/support/index.d.ts
-    * https://stackoverflow.com/questions/55842707/how-can-i-define-a-custom-assertion-operator-in-cypress
-      * https://stackoverflow.com/a/55854585/1297371
-    * https://github.com/freewind-demos/typescript-cypress-add-custom-assertion-method-textTrimmed-demo/blob/master/cypress/support/textTrimmed.ts
-* https://filiphric.com/cypress-basics-check-if-element-exists
-
-
-
-10 Consider custom Lazy Elements 
-
-
-
-11 Integrate with reporter like Allure 
-
-TODO
-
-
-
-**P.S. I** Afterwords
-
-Read as soon as you have time:
-
-* https://docs.cypress.io/guides/core-concepts/retry-ability
-* TODO: …
-
-
-
-**P.S. II** Other Usefull Resources
-
-Read when you need it…
-
-
-Modules & Globals
-
-* https://basarat.gitbook.io/typescript/project/modules/external-modules
-  * https://basarat.gitbook.io/typescript/project/modules/globals
-    * https://newbedev.com/create-a-global-variable-in-typescript
-      * https://stackoverflow.com/a/56984941/1297371 (https://stackoverflow.com/questions/38906359/create-a-global-variable-in-typescript)
-  * https://www.typescriptlang.org/docs/handbook/declaration-files/templates/global-d-ts.html
-* https://basarat.gitbook.io/typescript/type-system/intro/d.ts
-
-
-Other usefull resources
-
-* https://github.com/cypress-io/cypress-example-recipes
-
-* https://glebbahmutov.com/cypress-examples/8.6.0/
-
-
-## More...
-
-### Conventions
-
-* Use arrow functions over functions for mocha's `describe` and `it` to dissalow access and so cut the less consistent "this" style access to cypress aliases;). This will make tests more consistent and so more readable. Also it will be easier to debug them, and reduce errors connected to sync/async flow break.
+## Differences from other testing libraries
 
 ### Differences from raw Cypress
 
@@ -327,11 +322,6 @@ Other usefull resources
     * yet first action (e.g. type, click) on query (built as a chain of get filter find, etc) potentially break retry-ability for next actions
       * so remember and count that full retry-ability will work only for the first action
       * TODO: consider removing this limitation by implementing: store a chain of commands and call it only ON next cy.get or cy.request (etc.) OR custom cy.end()... or find another way:)
-* custom command `cy.the(selector)` automatically converts
-  * from `cy.the('some-word')` to `cy.get('[data-qa=some-word]')`
-  * from `cy.the('text=Some text')` to `cy.contains('Some text')`
-  * and behaves like common `cy.get(selector)` otherwise
-  * same convertion applies at calling `by` on `s(selector).by(selector)`, where by is a lazy version of cy.filter with extra conversions
 * you can write `.should(have.length, 3)` instead `.should('have.length', 3)`
 
 ### Differences from Selenide & Co

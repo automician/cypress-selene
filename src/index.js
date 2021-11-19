@@ -16,17 +16,12 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
-
-import '../../src'
-
-/*
+// TODO: consider exporting s, be, have instead of making them global
 
 global.browser = cy
 
-
 import { Locator } from './locator'
+
 global.s = (selector, options={}) => new Locator({
   path: selector,
 }, options)
@@ -36,4 +31,7 @@ import './conditions'
 import { be, have } from './conditions.aliases'
 global.be = be
 global.have = have
-*/
+
+export { 
+  Locator 
+}
