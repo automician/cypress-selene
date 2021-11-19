@@ -170,6 +170,19 @@ or
 import 'cypress-selene'
 ```
 
+For autocomplete and hints support add `"cypress-selene"` to the `"types"` section of your `jsconfig.json` or `tsconfig.json`:
+
+```
+{
+  "compilerOptions": {
+    "types": [
+      "cypress", 
+      "cypress-selene", 
+    ],
+  },
+}
+```
+
 ## Disclaimer
 
 The smarter retriability magic added to Cypress as a part of this package will make tests more stable but also slower. Though, some configuration will be added later – to tune "magic to your needs", and turn it off when you don't need it ;) (stay tuned and watch [#5](https://github.com/automician/cypress-selene/issues/5))
