@@ -2,8 +2,8 @@
   "name": "cypress-selene",
   "version": "1.0.0-alpha.1",
   "description": "Selene and Selenide based API to Cypress for easy to write and support Web UI tests",
-  "main": "src",
-  "types": "src",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "files": [
     "src"
   ],

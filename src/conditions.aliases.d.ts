@@ -1,6 +1,6 @@
 // --- Aliases --- // 
 
-declare const be: {
+export const be: {
   equalTo: string,
   visible: string,
   hidden: string,
@@ -23,7 +23,7 @@ declare const be: {
   }
 }
 
-declare const have: {
+export const have: {
   filtered: string
   the: string,
   elements: string,

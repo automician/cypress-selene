@@ -1,7 +1,7 @@
 /// <reference types='cypress' />
-/// <reference types='./locator' />
 
 import { Locator } from "./locator";
+import  * as alias from "./conditions.aliases"
 
 declare global {
 
@@ -9,6 +9,16 @@ declare global {
    * user-oriented alias to `cy`
    */
   const browser: Cypress.cy
+
+  /**
+   * object-oriented alias to string-oriented `'be.*'` Cypress chainers (matchers)
+   */
+  const be: typeof alias.be
+
+  /**
+   * object-oriented alias to string-oriented `'have.*'` Cypress chainers (matchers)
+   */
+  const have: typeof alias.have
 
 
   /**
