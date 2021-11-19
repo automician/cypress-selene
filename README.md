@@ -4,6 +4,19 @@ This library is a bunch of cypress extensions for writing more «user-oriented»
 
 See [changelog](https://github.com/automician/cypress-selene/blob/main/CHANGELOG.md) for detailed feature break down;)
 
+## Table of contents
+
+- [Summary](#summary)
+- [Table of contents](#table-of-contents)
+- [Why is it needed?](#why-is-it-needed)
+  - [Quick example](#quick-example)
+- [Intallation](#intallation)
+- [Disclaimer](#disclaimer)
+- [Main features breakdown](#main-features-breakdown)
+- [Differences from other testing libraries](#differences-from-other-testing-libraries)
+  - [Differences from raw Cypress](#differences-from-raw-cypress)
+  - [Differences from Selenide & Co](#differences-from-selenide--co)
+  - [Differences from Playwright and other async libs for web ui test automation](#differences-from-playwright-and-other-async-libs-for-web-ui-test-automation)
 
 ## Why is it needed?
 
