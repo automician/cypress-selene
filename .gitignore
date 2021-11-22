@@ -1,5 +1,8 @@
-#JavaScript
+# JavaScript
 node_modules
+
+# Packages
+*.tgz
 
 # Mac
 .DS_Store
