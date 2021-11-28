@@ -210,7 +210,6 @@ const elementsCollectionHaveFiltered = (_chai, utils) => {
 
 chai.use(elementsCollectionHaveFiltered)
 
-// TODO: cover with tests
 const elementHaveTextCaseInsensitive = (_chai, utils) => {
 
   function assertTextCaseInsensitive(text) {
@@ -249,7 +248,8 @@ const elementHaveTextCaseInsensitive = (_chai, utils) => {
   _chai.Assertion.addMethod('textCaseInsensitive', assertTextCaseInsensitive)
 }
 
-// TODO: cover with tests
+chai.use(elementHaveTextCaseInsensitive)
+
 const elementHaveExactTextCaseInsensitive = (_chai, utils) => {
 
   function assertExactTextCaseInsensitive(text) {
@@ -288,3 +288,5 @@ const elementHaveExactTextCaseInsensitive = (_chai, utils) => {
     assertExactTextCaseInsensitive,
   )
 }
+
+chai.use(elementHaveExactTextCaseInsensitive)
