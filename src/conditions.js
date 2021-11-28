@@ -209,3 +209,82 @@ const elementsCollectionHaveFiltered = (_chai, utils) => {
 }
 
 chai.use(elementsCollectionHaveFiltered)
+
+// TODO: cover with tests
+const elementHaveTextCaseInsensitive = (_chai, utils) => {
+
+  function assertTextCaseInsensitive(text) {
+    const $element = this._obj
+    const expectedText = text
+    const actualText = $element.text().trim()
+
+    this.assert(
+      // expression to be tested
+      actualText.toLowerCase().includes(
+        expectedText.toLowerCase()
+      ),
+      // msg or fn to describe failure
+      `${$element.selector} `
+      + 'should have text (case insensitive): #{exp}'
+      + '\nactual text: #{act}'
+      + '\nactual element:'
+      + '\n#{this}'
+      ,    
+      // msg or fn to describe negated failure
+      `${$element.selector} `
+      + 'should not have text (case insensitive): #{exp}'
+      + '\nactual text: #{act}'
+      + '\nactual element:'
+      + '\n#{this}'
+      ,    
+      // expected
+      expectedText,
+      // actual
+      actualText,
+      // show diff?
+      false, 
+    )
+  }
+
+  _chai.Assertion.addMethod('textCaseInsensitive', assertTextCaseInsensitive)
+}
+
+// TODO: cover with tests
+const elementHaveExactTextCaseInsensitive = (_chai, utils) => {
+
+  function assertExactTextCaseInsensitive(text) {
+    const $element = this._obj
+    const expectedText = text
+    const actualText = $element.text().trim()
+
+    this.assert(
+      // expression to be tested
+      actualText.toLowerCase() === expectedText.toLowerCase(),
+      // msg or fn to describe failure
+      `${$element.selector} `
+      + 'should have text (case insensitive): #{exp}'
+      + '\nactual text: #{act}'
+      + '\nactual element:'
+      + '\n#{this}'
+      ,    
+      // msg or fn to describe negated failure
+      `${$element.selector} `
+      + 'should not have text (case insensitive): #{exp}'
+      + '\nactual text: #{act}'
+      + '\nactual element:'
+      + '\n#{this}'
+      ,    
+      // expected
+      expectedText,
+      // actual
+      actualText,
+      // show diff?
+      false, 
+    )
+  }
+
+  _chai.Assertion.addMethod(
+    'exactTextCaseInsensitive', 
+    assertExactTextCaseInsensitive,
+  )
+}

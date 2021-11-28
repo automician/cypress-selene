@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security 
 - in case of vulnerabilities.
 
+## [1.0.0-alpha.3] - 2021-11-28
+### Added
+- have.textCaseInsensitive, have.exactTextCaseInsensitive
+
 ## [1.0.0-alpha.2] - 2021-11-20
 ### Added
 - locator.first(), locator.last()

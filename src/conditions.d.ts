@@ -84,6 +84,26 @@ declare namespace Cypress {
     * */
     (chainer: 'not.have.texts', ...values: string[] | [string[]]): Chainable<Subject>
 
+    /**
+    * Asserts exact text of element (by exact equals, ignoring case)
+    * */
+    (chainer: 'have.exactTextCaseInsensitive', value: string): Chainable<Subject>
+
+    /**
+    * Asserts exact text of element are not like expected (checks by exact equals, ignoring case)
+    * */
+    (chainer: 'not.have.exactTextCaseInsensitive', value: string): Chainable<Subject>
+
+    /**
+    * Asserts text of element (by contains, ignoring case)
+    * */
+    (chainer: 'have.textCaseInsensitive', value: string): Chainable<Subject>
+
+    /**
+    * Asserts text of element are not like expected (checks by contains, ignoring case)
+    * */
+    (chainer: 'not.have.textCaseInsensitive', value: string): Chainable<Subject>
+
   }
 }
 
@@ -119,5 +139,15 @@ declare namespace Chai {
        * Asserts texts of elements collection (every element by exact equals)
        */
       exactTexts(...values: string[]): Assertion
+
+      /**
+       * Asserts text of element (by contains, ignoring case)
+       */
+      textCaseInsensitive(value: string): Assertion
+
+      /**
+       * Asserts text of element (by exact equals, ignoring case)
+       */
+      exactTextCaseInsensitive(value: string): Assertion
   }
 }

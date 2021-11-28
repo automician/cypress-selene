@@ -48,6 +48,8 @@ export const have = {
   elements: 'have.elements',
   exactText: 'have.text', // TODO: implement as custom to log exact name
   text: 'include.text',
+  exactTextCaseInsensitive: 'have.exactTextCaseInsensitive',
+  textCaseInsensitive: 'have.textCaseInsensitive',
   exactTexts: 'have.exactTexts',
   texts: 'have.texts',
   attr: 'have.attr',
@@ -65,6 +67,8 @@ export const have = {
     elements: 'not.have.elements',
     exactText: 'not.have.text', // TODO: implement as custom to log exact name
     text: 'not.include.text',
+    exactTextCaseInsensitive: 'not.have.exactTextCaseInsensitive',
+    textCaseInsensitive: 'not.have.textCaseInsensitive',
     exactTexts: 'not.have.exactTexts',
     texts: 'not.have.texts',
     attr: 'not.have.attr',
