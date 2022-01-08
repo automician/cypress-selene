@@ -92,7 +92,7 @@ export class Locator {
     this.options = options // TODO: do we even need this options right now? maybe we need... but they might be our own...
   }
 
-  _guarded() {
+  _guarded(options = { hook: (guards) => guards }) {
 
     /**
      * GIVEN
@@ -172,8 +172,22 @@ export class Locator {
      * 
      * but for now let's stick to simple, not oprimized implementation: 
      */
-    this.chain.guards.forEach((guard) => {
+    options.hook(this.chain.guards).forEach((guard) => {
       guard()
+      /*
+       * currently each ... , 
+       * as implemented in this._subQuery (and so tightly coupled! :(...),
+       *       ... each guard checks for at least 1 element among found subject
+       * ! but what if we want to assert that subject is 0 length?
+       *   - must we even check last guard?
+       *   - hm... but probably we need this only for assertions...
+       *   - i.e. ... only if calling this.should - we don't need last guard, 
+       *     because the matcher passed to this.should(__HERE__, ...__WITH_ARGS__)
+       *     now should serve as the last guard!
+       *     we just need to ensure it will retry all chain! ... 
+       *     hence, TODO: implement this somehow inside this.should impl. 
+       *                  probably via custom hook
+       */
     })
   }
 
@@ -230,8 +244,8 @@ export class Locator {
         get: this.chain.get, 
         guards: [
           ...this.chain.guards,
-          () => this.chain.get({log: false}).should(($elements) => {  // TODO: move this pattern of "hiding assertions" to a separate function
-            const $queried = this._queryFrom($elements)
+          () => this.chain.get({log: false}).should(($elementsFromRoot) => {  // TODO: move this pattern of "hiding assertions" to a separate function
+            const $queried = this._queryFrom($elementsFromRoot)
 
             /**
              * if current guard passes, we could remember via alias the queried elements
